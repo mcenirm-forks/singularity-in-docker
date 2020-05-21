@@ -1,0 +1,53 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ test ]
+  pull_request:
+    branches: [ test ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    #- name: Build the Docker image
+    #  run: docker build . --file Dockerfile --tag singularity-in-docker:$(date +%s)
+    - name: Build and push Docker images
+      uses: docker/build-push-action@v1.1.0
+      with:
+        # Username used to log in to a Docker registry. If not set then no login will occur
+        username: ${{ registry.username }}
+        # Password or personal access token used to log in to a Docker registry. If not set then no login will occur
+        password: ${{ registry.token }}
+        # Server address of Docker registry. If not set then will default to Docker Hub
+        #registry: ${{ registry.username }}
+        # Docker repository to tag the image with
+        repository: ${{ registry.repository }}
+        # Comma-delimited list of tags. These will be added to the registry/repository to form the image's tags
+        tags: latest,3.5.3
+        # Automatically tags the built image with the git reference as per the readme
+        tag_with_ref: true
+        # Automatically tags the built image with the git short SHA as per the readme
+        tag_with_sha: true
+        # Path to the build context
+        #path: # optional, default is .
+        # Path to the Dockerfile (Default is '{path}/Dockerfile')
+        #dockerfile: # optional
+        # Sets the target stage to build
+        #target: # optional
+        # Always attempt to pull a newer version of the image
+        #always_pull: # optional
+        # Comma-delimited list of build-time variables
+        build_args: SINGULARITY_COMMITISH=v3.5.3
+        # Comma-delimited list of images to consider as cache sources
+        cache_froms: golang:1.14.0-alpine,alpine:3.7
+        # Comma-delimited list of labels to add to the built image
+        #labels: # optional
+        # Adds labels with git repository information to the built image
+        add_git_labels: true
+        # Whether to push the image
+        push: true
